@@ -1,0 +1,10 @@
+{
+    "name": "PhotonWaveOut",
+    "version": "0.0.1",
+    "author": "Stefan Sauer <ensonic@google.com>",
+    "license": "Apache-2.0",
+    "description": "Audio playback library for the particle.io",
+    "dependencies": {
+      "SparkIntervalTimer": "1.3.3"
+    }
+}
