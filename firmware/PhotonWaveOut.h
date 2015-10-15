@@ -19,32 +19,44 @@
 
 #include "SparkIntervalTimer/SparkIntervalTimer.h"
 
-class WaveOut {
-  private:
-    int pin_p, pin_n;
-    char *wave;
-    size_t wave_len;
-    bool loop;
-    bool playing;
-    volatile int wave_ix;
-    IntervalTimer audio_clock;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+class WaveOut {
   public:
+    int pin_p, pin_n;
+
+    // pin_p, pin_n: pins for positive/negative wave parts
     WaveOut(int pin_p, int pin_n) : pin_p(pin_p), pin_n(pin_n), playing(false) {
-      pinMode(pwm_p, OUTPUT);
-      pinResetFast(pwm_p);
-      pinMode(pwm_n, OUTPUT);
-      pinResetFast(pwm_n);
+      pinMode(pin_p, OUTPUT);
+      pinResetFast(pin_p);
+      pinMode(pin_n, OUTPUT);
+      pinResetFast(pin_n);
       audio_clock = new IntervalTimer();
     }
     ~WaveOut() {
       stop();
-      del audio_clock;
+      delete audio_clock;
     }
     
-    bool play(char *wave, size_t *wave_len, bool loop);
-    void stop(void);  
+    bool play(char *wave, unsigned int wave_len, bool loop);
+    void stop(void);
+    
+    // internal
+    int advance(void);
+  private:
+    char *wave;
+    unsigned int wave_len;
+    bool loop;
+    bool playing;
+    volatile unsigned int wave_ix;
+    IntervalTimer *audio_clock;
+};
+
+#ifdef __cplusplus
 }
+#endif
 
 #endif /* __WAVE_OUT__ */
 

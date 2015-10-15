@@ -16,33 +16,28 @@
 
 #include "PhotonWaveOut.h"
 
-static WaveOut *current = null;
+static WaveOut *current = NULL;
 
 static void playback_handler(void) {
-  int v = wave_data[wave_ix];
+  int v = current->advance();
   // manual PWM, we map value to pulse-width
   if (v >= 0x80) {
     v = 0xFF-v;
     if (v > 0) {
-      pinSetFast(current->pwm_n);
+      pinSetFast(current->pin_n);
       delayMicroseconds(v);
-      pinResetFast(current->pwm_n);
+      pinResetFast(current->pin_n);
     }
   } else {
     if (v > 0) {
-      pinSetFast(current->pwm_p);
+      pinSetFast(current->pin_p);
       delayMicroseconds(v);
-      pinResetFast(current->pwm_p);
+      pinResetFast(current->pin_p);
     }
-  }
-  current->wave_ix++;
-  if (current->wave_ix >= current->wave_len) {
-    current->wave_ix = 0;
-    // TODO: do loop = false
   }
 }
     
-bool WaveOut::play(char *wave, size_t *wave_len, bool loop) {
+bool WaveOut::play(char *wave, unsigned int wave_len, bool loop) {
   if (playing)
     stop();
 
@@ -52,8 +47,9 @@ bool WaveOut::play(char *wave, size_t *wave_len, bool loop) {
   this->wave_ix = 0;
   current = this;
   // for 8000 Hz this should be 125, but we cheat a bit to be able to map the samples straight
-  audio_clock->begin(play_wave, 127, uSec);
+  audio_clock->begin(playback_handler, 127, uSec);
   this->playing = true;
+  return true;
 }
 
 void WaveOut::stop(void) {
@@ -61,9 +57,19 @@ void WaveOut::stop(void) {
     return;
 
   audio_clock->end();
-  pinResetFast(pwm_p);
-  pinResetFast(pwm_n);
+  pinResetFast(pin_p);
+  pinResetFast(pin_n);
   this->playing = false;
-  current = null;
+  current = NULL;
+}
+
+int WaveOut::advance(void) {
+  int v = wave[wave_ix];
+  wave_ix++;
+  if (wave_ix >= wave_len) {
+    wave_ix = 0;
+    // TODO: do loop = false
+  }
+  return v;
 }
 

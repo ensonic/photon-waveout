@@ -38,7 +38,7 @@ WaveOut *wave;
 
 void setup() {
   pinMode(led, OUTPUT);
-  wave = new WaveOut(pin_p, pin_n);
+  wave = new WaveOut(pwm_p, pwm_n);
 }
 
 bool clicked = false;
