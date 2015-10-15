@@ -8,12 +8,18 @@ official Google product.
 
 First you need to convert you audio sample into a c header. One way you can do
 it is:
+
+```Shell
 gst-launch-1.0 -q uridecodebin uri=file:///path/to/audio-file ! audioconvert ! \
   audioresample ! audioconvert ! "audio/x-raw,format=S8,rate=7874,channels=1" ! \
   filesink location=/tmp/snd; \
   perl ~/bin/bin2hex.pl /tmp/snd 1 >/tmp/wave_data.h
+```
 
 gstreamer is included with most linux distros and I found the bin2hex.pl at
 http://www.chami.com/tips/delphi/052098D.html
 
+## wiring
+
+![wiring](waveout.png)
 
