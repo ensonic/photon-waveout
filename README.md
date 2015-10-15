@@ -13,7 +13,7 @@ it is:
 gst-launch-1.0 -q uridecodebin uri=file:///path/to/audio-file ! audioconvert ! \
   audioresample ! audioconvert ! "audio/x-raw,format=S8,rate=7874,channels=1" ! \
   filesink location=/tmp/snd; \
-  perl ~/bin/bin2hex.pl /tmp/snd 1 >/tmp/wave_data.h
+  perl ~/bin/bin2hex.pl /tmp/snd 1 | sed -e 's/bin_data|wave_data/' >/tmp/wave_data.h
 ```
 
 gstreamer is included with most linux distros and I found the bin2hex.pl at
