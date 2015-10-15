@@ -59,8 +59,12 @@ void WaveOut::stop(void) {
   audio_clock->end();
   pinResetFast(pin_p);
   pinResetFast(pin_n);
-  this->playing = false;
+  playing = false;
   current = NULL;
+}
+
+bool WaveOut::isPlaying(void) {
+  return playing;
 }
 
 int WaveOut::advance(void) {

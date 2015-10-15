@@ -42,6 +42,7 @@ class WaveOut {
     
     bool play(char *wave, unsigned int wave_len, bool loop);
     void stop(void);
+    bool isPlaying(void);
     
     // internal
     int advance(void);
