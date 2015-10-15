@@ -34,6 +34,9 @@ const int led = D7;
 const int btn = D0;
 
 WaveOut *wave;
+// signed 8 bit audio at 7874 Hz
+// gst-launch-1.0 -q uridecodebin uri=file:///path/to/audio-file ! audioconvert ! audioresample ! audioconvert ! "audio/x-raw,format=S8,rate=7874,channels=1" ! filesink location=/tmp/snd; \
+//   perl ~/bin/bin2hex.pl /tmp/snd 1 >/tmp/wave_data.h
 #include "wave_data.h"
 
 void setup() {
@@ -67,6 +70,11 @@ void loop() {
       }
       clicked = false;
     }
+  }
+  // only needed for loop=false
+  if (playing && !wave->isPlaying()) {
+    playing = false;
+    digitalWrite(led, LOW);
   }
 }
 
