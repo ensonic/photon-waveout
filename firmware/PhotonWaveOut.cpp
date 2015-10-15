@@ -67,8 +67,11 @@ int WaveOut::advance(void) {
   int v = wave[wave_ix];
   wave_ix++;
   if (wave_ix >= wave_len) {
-    wave_ix = 0;
-    // TODO: do loop = false
+    if (loop) {
+      wave_ix = 0;
+    } else {
+      stop();
+    }
   }
   return v;
 }
