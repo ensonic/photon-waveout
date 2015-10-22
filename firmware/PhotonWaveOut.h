@@ -28,11 +28,11 @@ class WaveOut {
     // pin_p, pin_n: pins for positive/negative wave parts
     WaveOut(int pin_p, int pin_n);
     ~WaveOut();
-    
+
     bool play(char *wave, unsigned int wave_len, bool loop);
     void stop(void);
     bool isPlaying(void);
-    
+
   private:
     int advance(void);
 
@@ -43,7 +43,7 @@ class WaveOut {
     bool playing;
     volatile unsigned int wave_ix;
     IntervalTimer audio_clock;
-    
+
     static WaveOut *current;
     static void playback_handler(void);
 };

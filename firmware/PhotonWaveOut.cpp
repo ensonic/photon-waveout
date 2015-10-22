@@ -25,6 +25,7 @@ WaveOut::WaveOut(int pin_p, int pin_n) : pin_p(pin_p), pin_n(pin_n),
   pinMode(pin_n, OUTPUT);
   pinResetFast(pin_n);
 }
+
 WaveOut::~WaveOut() {
   stop();
 }
