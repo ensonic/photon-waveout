@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2015 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,27 +16,19 @@
 
 #include "PhotonWaveOut.h"
 
-static WaveOut *current = NULL;
+WaveOut *WaveOut::current;
 
-static void playback_handler(void) {
-  int v = current->advance();
-  // manual PWM, we map value to pulse-width
-  if (v >= 0x80) {
-    v = 0xFF-v;
-    if (v > 0) {
-      pinSetFast(current->pin_n);
-      delayMicroseconds(v);
-      pinResetFast(current->pin_n);
-    }
-  } else {
-    if (v > 0) {
-      pinSetFast(current->pin_p);
-      delayMicroseconds(v);
-      pinResetFast(current->pin_p);
-    }
-  }
+WaveOut::WaveOut(int pin_p, int pin_n) : pin_p(pin_p), pin_n(pin_n),
+    playing(false),  audio_clock() {
+  pinMode(pin_p, OUTPUT);
+  pinResetFast(pin_p);
+  pinMode(pin_n, OUTPUT);
+  pinResetFast(pin_n);
 }
-    
+WaveOut::~WaveOut() {
+  stop();
+}
+
 bool WaveOut::play(char *wave, unsigned int wave_len, bool loop) {
   if (playing)
     stop();
@@ -44,11 +36,12 @@ bool WaveOut::play(char *wave, unsigned int wave_len, bool loop) {
   this->wave = wave;
   this->wave_len = wave_len;
   this->loop = loop;
-  this->wave_ix = 0;
+  wave_ix = 0;
   current = this;
-  // for 8000 Hz this should be 125, but we cheat a bit to be able to map the samples straight
-  audio_clock->begin(playback_handler, 127, uSec);
-  this->playing = true;
+  // for 8000 Hz this should be 125, but we cheat a bit to be able to map the
+  // sample-values (0...127) straight to the delay
+  audio_clock.begin(playback_handler, 127, uSec);
+  playing = true;
   return true;
 }
 
@@ -56,7 +49,7 @@ void WaveOut::stop(void) {
   if (!playing)
     return;
 
-  audio_clock->end();
+  audio_clock.end();
   pinResetFast(pin_p);
   pinResetFast(pin_n);
   playing = false;
@@ -80,3 +73,21 @@ int WaveOut::advance(void) {
   return v;
 }
 
+void WaveOut::playback_handler(void) {
+  int v = current->advance();
+  // manual PWM, we map value to pulse-width
+  if (v >= 0x80) {
+    v = 0xFF-v;
+    if (v > 0) {
+      pinSetFast(current->pin_n);
+      delayMicroseconds(v);
+      pinResetFast(current->pin_n);
+    }
+  } else {
+    if (v > 0) {
+      pinSetFast(current->pin_p);
+      delayMicroseconds(v);
+      pinResetFast(current->pin_p);
+    }
+  }
+}

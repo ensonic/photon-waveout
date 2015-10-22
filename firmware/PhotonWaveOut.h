@@ -25,34 +25,27 @@ extern "C" {
 
 class WaveOut {
   public:
-    int pin_p, pin_n;
-
     // pin_p, pin_n: pins for positive/negative wave parts
-    WaveOut(int pin_p, int pin_n) : pin_p(pin_p), pin_n(pin_n), playing(false) {
-      pinMode(pin_p, OUTPUT);
-      pinResetFast(pin_p);
-      pinMode(pin_n, OUTPUT);
-      pinResetFast(pin_n);
-      audio_clock = new IntervalTimer();
-    }
-    ~WaveOut() {
-      stop();
-      delete audio_clock;
-    }
+    WaveOut(int pin_p, int pin_n);
+    ~WaveOut();
     
     bool play(char *wave, unsigned int wave_len, bool loop);
     void stop(void);
     bool isPlaying(void);
     
-    // internal
-    int advance(void);
   private:
+    int advance(void);
+
+    int pin_p, pin_n;
     char *wave;
     unsigned int wave_len;
     bool loop;
     bool playing;
     volatile unsigned int wave_ix;
-    IntervalTimer *audio_clock;
+    IntervalTimer audio_clock;
+    
+    static WaveOut *current;
+    static void playback_handler(void);
 };
 
 #ifdef __cplusplus
