@@ -91,4 +91,9 @@ void WaveOut::playback_handler(void) {
       pinResetFast(current->pin_p);
     }
   }
+  /* once DAC bug in 0.4.7 (https://github.com/spark/firmware/issues/671) is
+   * fixed we could do this with one pin instead:
+  pinMode(audio, OUTPUT);
+  analogWrite(audio, (v<<4));
+  */
 }

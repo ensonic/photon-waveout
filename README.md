@@ -16,6 +16,17 @@ gst-launch-1.0 -q uridecodebin uri=file:///path/to/audio-file ! audioconvert ! \
   perl ~/bin/bin2hex.pl /tmp/snd 1 | sed -e 's/bin_data|wave_data/' >/tmp/wave_data.h
 ```
 
+An alternative for bin2hex.pl would be:
+
+```Shell
+size=$(stat -c "%s" /tmp/snd); \
+(
+  echo "static uint8_t wave_data[] = { /* ${size} */";
+  hexdump -v -e '15/1 "0x%02X," "\n"' /tmp/snd | sed -e 's/0x  ,//g';
+  echo "};"
+) >wave_data.h
+```
+
 gstreamer is included with most linux distros and I found the bin2hex.pl at
 http://www.chami.com/tips/delphi/052098D.html
 
